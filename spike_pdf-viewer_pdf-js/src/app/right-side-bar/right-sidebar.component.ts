@@ -8,8 +8,8 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 export class RightSidebarComponent implements OnInit {
   isDrawing = false;
   drawingName = '';
-  selectedColor!: string;
-  selectedThickness!: number;
+  selectedColor = 'blue';
+  selectedThickness = 3;
 
   @Output() newDrawing = new EventEmitter<void>();
   @Output() colorSelected = new EventEmitter<string>();

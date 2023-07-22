@@ -8,15 +8,12 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'spike_pdf-viewer_pdf-js';
 
-  drawingColor: string = 'red';
-  drawingThickness: number = 1;
+  drawingColor: string = 'blue';
+  drawingThickness: number = 3;
   drawingEnabled: boolean = false;
 
   onNewDrawing() {
-    console.log(`onNewDrawing called!`);
-
     this.drawingEnabled = true;
-    console.log(`drawingEnabled: ${this.drawingEnabled}`);
   }
 
   onFinishDrawing(event: { name: string; color: string }) {
@@ -24,14 +21,10 @@ export class AppComponent {
   }
 
   handleColorSelected(color: string) {
-    console.log(`app.component - handleColorSelected - color: ${color}`);
     this.drawingColor = color;
   }
 
   handleThinknessSelected(thickness: number) {
-    console.log(
-      `app.component - handleThinknessSelected - thickness: ${thickness}`
-    );
     this.drawingThickness = thickness;
   }
 }
