@@ -27,4 +27,15 @@ export class AppComponent {
   handleThinknessSelected(thickness: number) {
     this.drawingThickness = thickness;
   }
+
+  leftSidebarVisible: boolean = true;
+  rightSidebarVisible: boolean = true;
+
+  handleSidebarVisibilityChange(sidebar: 'left' | 'right', isVisible: boolean) {
+    if (sidebar === 'left') {
+      this.leftSidebarVisible = isVisible;
+    } else {
+      this.rightSidebarVisible = isVisible;
+    }
+  }
 }

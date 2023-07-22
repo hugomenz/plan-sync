@@ -1,4 +1,5 @@
 <div class="sidebar">
+  <h3>Crea nueva anotacion</h3>
   <button (click)="onNewDrawing()">+</button>
   <div *ngIf="isDrawing" class="tools">
     <input [(ngModel)]="drawingName" placeholder="Nombre del dibujo" />
