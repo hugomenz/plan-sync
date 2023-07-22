@@ -1,0 +1,26 @@
+<div class="toolbar">
+  <button
+    class="color-button"
+    style="background-color: red"
+    (click)="selectColor('red')"
+  ></button>
+  <button
+    class="color-button"
+    style="background-color: blue"
+    (click)="selectColor('blue')"
+  ></button>
+  <button
+    class="color-button"
+    style="background-color: green"
+    (click)="selectColor('green')"
+  ></button>
+
+  <button (click)="selectThickness(1)">1px</button>
+  <button (click)="selectThickness(3)">3px</button>
+  <button (click)="selectThickness(5)">5px</button>
+
+  <label>
+    <input type="checkbox" (change)="toggleDrawing($event)" />
+    Activar dibujo
+  </label>
+</div>

@@ -1,0 +1,13 @@
+<app-pdf-viewer
+  class="pdf-viewer"
+  [drawingColor]="drawingColor"
+  [drawingThickness]="drawingThickness"
+  [drawingEnabled]="drawingEnabled"
+></app-pdf-viewer>
+<app-sidebar
+  class="right-sidebar"
+  (newDrawing)="onNewDrawing()"
+  (finishDrawing)="onFinishDrawing($event)"
+  (colorSelected)="handleColorSelected($event)"
+  (thicknessSelected)="handleThinknessSelected($event)"
+></app-sidebar>

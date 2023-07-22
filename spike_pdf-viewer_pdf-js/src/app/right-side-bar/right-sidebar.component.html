@@ -1,0 +1,22 @@
+<div class="sidebar">
+  <button (click)="onNewDrawing()">+</button>
+  <div *ngIf="isDrawing" class="tools">
+    <input [(ngModel)]="drawingName" placeholder="Nombre del dibujo" />
+    <select [(ngModel)]="selectedColor" (ngModelChange)="onColorChange()">
+      <option value="red">Rojo</option>
+      <option value="blue">Azul</option>
+      <option value="green">Verde</option>
+    </select>
+
+    <select
+      [(ngModel)]="selectedThickness"
+      (ngModelChange)="onThicknessChange()"
+    >
+      <option value="1">1px</option>
+      <option value="3">3px</option>
+      <option value="5">5px</option>
+    </select>
+
+    <button (click)="onFinishDrawing()">Finalizar</button>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+.toolbar {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+
+.color-button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 15px; // esto hará que los botones sean círculos
+  cursor: pointer;
+  outline: none;
+}
+
+/* Puedes añadir un borde cuando el mouse esté encima para resaltar el color seleccionado */
+.color-button:hover {
+  border: 2px solid #000;
+}
