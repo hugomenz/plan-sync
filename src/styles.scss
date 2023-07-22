@@ -1,1 +1,29 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+}
+
+app-left-sidebar,
+app-right-sidebar {
+  transition: all 0.5s ease;
+}
+
+app-left-sidebar {
+  width: 160px;
+  font-size: 14px;
+}
+
+app-pdf-viewer {
+  width: calc(100% - 300px);
+  transition: all 0.5s ease;
+}
+
+app-right-sidebar {
+  width: 150px;
+}
+
+.sidebar-collapsed {
+  width: 0 !important;
+  overflow: hidden;
+}

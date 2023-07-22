@@ -1,0 +1,18 @@
+<button
+  (click)="toggleSidebar()"
+  class="toggle-button"
+  [class.collapsed]="!sidebarVisible"
+>
+  {{ sidebarVisible ? "Ocultar" : "Mostrar" }}
+</button>
+<div class="sidebar" [class.collapsed]="!sidebarVisible">
+  <ul>
+    <li
+      *ngFor="let annotation of annotations"
+      (click)="selectAnnotation(annotation)"
+    >
+      {{ annotation.name }}
+      <span [style.background-color]="annotation.color"></span>
+    </li>
+  </ul>
+</div>

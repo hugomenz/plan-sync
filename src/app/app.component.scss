@@ -1,12 +1,5 @@
-.pdf-viewer {
-  width: calc(100% - 300px);
+:host {
+  display: flex;
   height: 100vh;
-  overflow: auto;
-  float: left;
-}
-
-.right-sidebar {
-  width: 300px;
-  height: 100vh;
-  float: right;
+  width: 100%;
 }
