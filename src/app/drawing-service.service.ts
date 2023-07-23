@@ -9,11 +9,13 @@ export class DrawingService {
   private _stopDrawing = new Subject<void>();
   private _colorChange = new BehaviorSubject<string>('blue');
   private _thicknessChange = new BehaviorSubject<number>(3);
+  private _saveAnnotation = new Subject<string>();
 
   startDrawing$ = this._startDrawing.asObservable();
   stopDrawing$ = this._stopDrawing.asObservable();
   colorChange$ = this._colorChange.asObservable();
   thicknessChange$ = this._thicknessChange.asObservable();
+  saveAnnotation$ = this._saveAnnotation.asObservable();
 
   startDrawing() {
     this._startDrawing.next();
@@ -32,5 +34,9 @@ export class DrawingService {
     console.log(`called changeThickness: ${thickness}`);
 
     this._thicknessChange.next(thickness);
+  }
+
+  saveAnnotation(name: string) {
+    this._saveAnnotation.next(name);
   }
 }

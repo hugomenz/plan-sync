@@ -35,6 +35,7 @@ export class RightSidebarComponent implements OnInit {
 
   onFinishDrawing() {
     this.isDrawing = false;
+    this.drawingService.saveAnnotation(this.drawingName);
     this.drawingService.stopDrawing();
   }
 

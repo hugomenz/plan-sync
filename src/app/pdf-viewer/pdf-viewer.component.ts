@@ -9,6 +9,7 @@ import { fabric } from 'fabric';
 import * as pdfjsLib from 'pdfjs-dist';
 import { Subject, takeUntil } from 'rxjs';
 import { DrawingService } from '../drawing-service.service';
+import { DrawingAnnotationService } from '../drawing-annotation.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -22,7 +23,13 @@ export class PdfViewerComponent implements AfterViewInit {
   private brush!: fabric.PencilBrush;
   private destroy$ = new Subject<void>();
 
-  constructor(private drawingService: DrawingService) {}
+  private currentColor: string = 'black'; // valor por defecto
+  private currentThickness: number = 1; // valor por defecto
+
+  constructor(
+    private drawingService: DrawingService,
+    public drawingAnnotationService: DrawingAnnotationService
+  ) {}
 
   ngAfterViewInit() {
     this.fabricCanvas = new fabric.Canvas(this.canvasElement.nativeElement);
@@ -42,19 +49,31 @@ export class PdfViewerComponent implements AfterViewInit {
     this.drawingService.colorChange$
       .pipe(takeUntil(this.destroy$))
       .subscribe((color) => {
+        this.currentColor = color; // actualiza el color actual
         if (this.brush) {
           this.brush.color = color;
         }
-        console.log(`from observable pdf-viewer,. color: ${color}`);
       });
 
     this.drawingService.thicknessChange$
       .pipe(takeUntil(this.destroy$))
       .subscribe((thickness) => {
+        this.currentThickness = thickness; // actualiza el grosor actual
         if (this.brush) {
           this.brush.width = thickness;
         }
-        console.log(`from observable pdf-viewer, thickness: ${thickness}`);
+      });
+
+    this.drawingService.saveAnnotation$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((name) => {
+        const json = JSON.stringify(this.fabricCanvas.toJSON());
+        this.drawingAnnotationService.addAnnotation(
+          name,
+          this.currentColor, // utiliza el color actual
+          this.currentThickness, // utiliza el grosor actual
+          json
+        );
       });
 
     this.loadPDF();
