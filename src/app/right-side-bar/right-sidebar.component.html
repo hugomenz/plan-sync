@@ -3,7 +3,10 @@
   <button (click)="onNewDrawing()">+</button>
   <div *ngIf="isDrawing" class="tools">
     <input [(ngModel)]="drawingName" placeholder="Nombre del dibujo" />
-    <select [(ngModel)]="selectedColor" (ngModelChange)="onColorChange()">
+    <select
+      [(ngModel)]="selectedColor"
+      (ngModelChange)="drawingService.changeColor(selectedColor)"
+    >
       <option value="red">Rojo</option>
       <option value="blue">Azul</option>
       <option value="green">Verde</option>
@@ -11,7 +14,7 @@
 
     <select
       [(ngModel)]="selectedThickness"
-      (ngModelChange)="onThicknessChange()"
+      (ngModelChange)="drawingService.changeThickness(selectedThickness)"
     >
       <option value="1">1px</option>
       <option value="3">3px</option>
@@ -19,5 +22,6 @@
     </select>
 
     <button (click)="onFinishDrawing()">Finalizar</button>
+    <!-- Updated -->
   </div>
 </div>

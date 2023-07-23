@@ -18,6 +18,8 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
+    "@types/fabric": "^5.3.3",
+    "fabric": "^5.3.0",
     "pdfjs-dist": "^3.8.162",
     "pixi.js": "^7.2.4",
     "rxjs": "~7.5.0",

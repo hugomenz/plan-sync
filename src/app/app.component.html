@@ -3,18 +3,15 @@
   (sidebarVisibilityChanged)="handleSidebarVisibilityChange('left', $event)"
 ></app-left-sidebar>
 
-<app-pdf-viewer
-  class="pdf-viewer"
-  [drawingColor]="drawingColor"
-  [drawingThickness]="drawingThickness"
-  [drawingEnabled]="drawingEnabled"
-></app-pdf-viewer>
-<app-right-sidebar
+<app-pdf-viewer class="pdf-viewer"></app-pdf-viewer>
+<!-- Updated -->
+
+<app-right-sidebar class="right-sidebar"></app-right-sidebar>
+<!-- Updated -->
+
+<!-- <app-right-sidebar
   class="right-sidebar"
   [ngClass]="{ 'sidebar-collapsed': !rightSidebarVisible }"
-  (newDrawing)="onNewDrawing()"
-  (finishDrawing)="onFinishDrawing($event)"
-  (colorSelected)="handleColorSelected($event)"
-  (thicknessSelected)="handleThinknessSelected($event)"
   (sidebarVisibilityChanged)="handleSidebarVisibilityChange('right', $event)"
-></app-right-sidebar>
+></app-right-sidebar> <!-- Updated -->
+-->
