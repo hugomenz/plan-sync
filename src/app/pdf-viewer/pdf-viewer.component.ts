@@ -5,7 +5,11 @@ import {
   AfterViewInit,
   Input,
 } from '@angular/core';
+import { fabric } from 'fabric';
 import * as pdfjsLib from 'pdfjs-dist';
+import { Subject, takeUntil } from 'rxjs';
+import { DrawingService } from '../drawing-service.service';
+import { DrawingAnnotationService } from '../drawing-annotation.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -13,31 +17,69 @@ import * as pdfjsLib from 'pdfjs-dist';
   styleUrls: ['./pdf-viewer.component.scss'],
 })
 export class PdfViewerComponent implements AfterViewInit {
-  @ViewChild('myCanvas', { static: false }) canvas!: ElementRef;
+  @ViewChild('myCanvas', { static: false }) canvasElement!: ElementRef;
 
-  drawing = false;
+  private fabricCanvas!: fabric.Canvas;
+  private brush!: fabric.PencilBrush;
+  private destroy$ = new Subject<void>();
 
-  @Input()
-  set drawingColor(color: string) {
-    this._drawingColor = color;
-  }
-  get drawingColor() {
-    return this._drawingColor;
-  }
-  private _drawingColor!: string;
+  private currentColor: string = 'black'; // valor por defecto
+  private currentThickness: number = 1; // valor por defecto
 
-  @Input()
-  set drawingThickness(thickness: number) {
-    this._drawingThickness = thickness;
-  }
-  get drawingThickness() {
-    return this._drawingThickness;
-  }
-  private _drawingThickness!: number;
-
-  @Input() drawingEnabled!: boolean;
+  constructor(
+    private drawingService: DrawingService,
+    public drawingAnnotationService: DrawingAnnotationService
+  ) {}
 
   ngAfterViewInit() {
+    this.fabricCanvas = new fabric.Canvas(this.canvasElement.nativeElement);
+
+    this.drawingService.startDrawing$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.fabricCanvas.isDrawingMode = true;
+      });
+
+    this.drawingService.stopDrawing$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.fabricCanvas.isDrawingMode = false;
+      });
+
+    this.drawingService.colorChange$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((color) => {
+        this.currentColor = color; // actualiza el color actual
+        if (this.brush) {
+          this.brush.color = color;
+        }
+      });
+
+    this.drawingService.thicknessChange$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((thickness) => {
+        this.currentThickness = thickness; // actualiza el grosor actual
+        if (this.brush) {
+          this.brush.width = thickness;
+        }
+      });
+
+    this.drawingService.saveAnnotation$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((name) => {
+        const json = JSON.stringify(this.fabricCanvas.toJSON());
+        this.drawingAnnotationService.addAnnotation(
+          name,
+          this.currentColor, // utiliza el color actual
+          this.currentThickness, // utiliza el grosor actual
+          json
+        );
+      });
+
+    this.loadPDF();
+  }
+
+  private loadPDF(): void {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.8.162/pdf.worker.min.js';
 
@@ -54,17 +96,43 @@ export class PdfViewerComponent implements AfterViewInit {
           const scale = 1.5;
           const viewport = page.getViewport({ scale: scale });
 
-          const context = this.canvas.nativeElement.getContext('2d');
-          this.canvas.nativeElement.height = viewport.height;
-          this.canvas.nativeElement.width = viewport.width;
+          this.fabricCanvas.setHeight(viewport.height);
+          this.fabricCanvas.setWidth(viewport.width);
 
+          // Crear un nuevo canvas para renderizar la página PDF
+          const pdfCanvas = document.createElement('canvas');
+          pdfCanvas.height = viewport.height;
+          pdfCanvas.width = viewport.width;
+          const context = pdfCanvas.getContext('2d');
+          if (!context) {
+            console.error('2D context not available');
+            return;
+          }
           const renderContext = {
             canvasContext: context,
             viewport: viewport,
           };
+
           const renderTask = page.render(renderContext);
           renderTask.promise.then(() => {
             console.log('Page rendered');
+
+            this.brush = new fabric.PencilBrush(this.fabricCanvas);
+            this.fabricCanvas.freeDrawingBrush = this.brush;
+
+            fabric.Image.fromURL(pdfCanvas.toDataURL(), (img) => {
+              img.set({
+                left: 0,
+                top: 0,
+                angle: 0,
+                opacity: 1.0,
+                selectable: false, // Esto hace que la imagen del PDF no sea seleccionable, es decir, no puedes moverla ni cambiarla de tamaño
+              });
+
+              // Añade la imagen del PDF al canvas de Fabric.js
+              this.fabricCanvas.add(img);
+              this.fabricCanvas.sendToBack(img);
+            });
           });
         });
       },
@@ -74,46 +142,8 @@ export class PdfViewerComponent implements AfterViewInit {
     );
   }
 
-  handleCanvasMouseDown(event: MouseEvent) {
-    // TODO: Investigate paperjs para simplificar los dibujos y asi suavizar lineas
-
-    if (!this.drawingEnabled) {
-      return;
-    }
-
-    this.drawing = true;
-
-    const context = this.canvas.nativeElement.getContext('2d');
-    context.strokeStyle = this.drawingColor;
-    context.fillStyle = this.drawingColor;
-    context.lineWidth = this.drawingThickness;
-    context.beginPath();
-
-    const rect = this.canvas.nativeElement.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    context.moveTo(x, y);
-  }
-
-  handleCanvasMouseMove(event: MouseEvent) {
-    if (!this.drawingEnabled || !this.drawing) {
-      return;
-    }
-
-    const context = this.canvas.nativeElement.getContext('2d');
-
-    const rect = this.canvas.nativeElement.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    context.lineTo(x, y);
-    context.stroke();
-  }
-
-  handleCanvasMouseUp(event: MouseEvent) {
-    if (!this.drawingEnabled) {
-      return;
-    }
-
-    this.drawing = false;
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

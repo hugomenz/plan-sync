@@ -1,4 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { DrawingService } from '../drawing-service.service';
 
 @Component({
   selector: 'app-right-sidebar',
@@ -11,30 +12,37 @@ export class RightSidebarComponent implements OnInit {
   selectedColor = 'blue';
   selectedThickness = 3;
 
-  @Output() newDrawing = new EventEmitter<void>();
-  @Output() colorSelected = new EventEmitter<string>();
-  @Output() thicknessSelected = new EventEmitter<number>();
-  @Output() finishDrawing = new EventEmitter<{ name: string; color: string }>();
-  @Output() sidebarVisibilityChanged = new EventEmitter<boolean>();
+  @Output() sidebarVisibilityChanged: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
-  constructor() {}
+  constructor(public drawingService: DrawingService) {}
 
   ngOnInit(): void {}
 
   onNewDrawing() {
     this.isDrawing = true;
     this.drawingName = '';
-    this.newDrawing.emit();
+    this.drawingService.startDrawing();
+  }
+
+  onColorChange() {
+    this.drawingService.changeColor(this.selectedColor);
+  }
+
+  onThicknessChange() {
+    this.drawingService.changeThickness(this.selectedThickness);
   }
 
   onFinishDrawing() {
     this.isDrawing = false;
-  }
-  onColorChange() {
-    this.colorSelected.emit(this.selectedColor);
+    this.drawingService.saveAnnotation(this.drawingName);
+    this.drawingService.stopDrawing();
   }
 
-  onThicknessChange() {
-    this.thicknessSelected.emit(this.selectedThickness);
+  isVisible: boolean = true; // Asume que la barra lateral es visible inicialmente
+
+  toggleSidebar() {
+    this.isVisible = !this.isVisible; // Cambia el estado
+    this.sidebarVisibilityChanged.emit(this.isVisible); // Emite el nuevo estado
   }
 }
