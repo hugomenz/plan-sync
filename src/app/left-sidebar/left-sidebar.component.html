@@ -8,7 +8,7 @@
 <div class="sidebar" [class.collapsed]="!sidebarVisible">
   <ul>
     <li
-      *ngFor="let annotation of annotations"
+      *ngFor="let annotation of drawingAnnotationService.annotations"
       (click)="selectAnnotation(annotation)"
     >
       {{ annotation.name }}

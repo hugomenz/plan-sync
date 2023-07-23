@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { DrawingAnnotationService } from '../drawing-annotation.service';
+import { Annotation } from '../models';
 
 @Component({
   selector: 'app-left-sidebar',
@@ -6,24 +8,16 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./left-sidebar.component.scss'],
 })
 export class LeftSidebarComponent {
+  constructor(public drawingAnnotationService: DrawingAnnotationService) {}
+
   sidebarVisible: boolean = true;
 
-  // Array of annotations
-  @Input() annotations: { name: string; color: string }[] = [
-    { name: 'Anotación 1', color: 'red' },
-    { name: 'Anotación 2', color: 'blue' },
-    { name: 'Anotación 3', color: 'green' },
-  ];
-
   // Event emitter for when an annotation is selected
-  @Output() annotationSelected = new EventEmitter<{
-    name: string;
-    color: string;
-  }>();
+  @Output() annotationSelected = new EventEmitter<Annotation>();
 
   @Output() sidebarVisibilityChanged = new EventEmitter<boolean>();
 
-  selectAnnotation(annotation: { name: string; color: string }) {
+  selectAnnotation(annotation: Annotation) {
     // Emit the selected annotation
     this.annotationSelected.emit(annotation);
   }
