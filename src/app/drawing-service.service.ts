@@ -40,20 +40,4 @@ export class DrawingService {
   saveAnnotation(name: string) {
     this._saveAnnotation.next(name);
   }
-
-  // En DrawingService
-  private _highlightAnnotation = new Subject<Annotation>();
-
-  highlightAnnotation$ = this._highlightAnnotation.asObservable();
-
-  highlightAnnotation(annotation: Annotation) {
-    console.log(
-      'highlightAnnotation method called with annotation:',
-      annotation
-    );
-
-    console.log(`annotation path length : ${annotation}`);
-
-    this._highlightAnnotation.next(annotation);
-  }
 }

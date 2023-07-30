@@ -67,56 +67,51 @@ export class PdfViewerComponent implements AfterViewInit {
     this.drawingService.saveAnnotation$
       .pipe(takeUntil(this.destroy$))
       .subscribe((name) => {
-        const json = JSON.stringify(this.fabricCanvas.toJSON());
-        this.drawingAnnotationService.addAnnotation(
-          name,
-          this.currentColor, // utiliza el color actual
-          this.currentThickness, // utiliza el grosor actual
-          json,
-          this.fabricCanvas.toJSON().objects
-        );
-        console.log('-----------------------------------------');
-        console.log(`guardando - desde servicio - `);
-        console.log(JSON.stringify(this.fabricCanvas.toJSON().objects));
-        console.log('-----------------------------------------');
+        // Guarda solo el último objeto añadido al lienzo
+        const lastObject = this.fabricCanvas.getObjects().slice(-1)[0];
+        if (lastObject) {
+          this.drawingAnnotationService.addAnnotation(
+            name,
+            this.currentColor,
+            this.currentThickness,
+            JSON.stringify(lastObject.toJSON()),
+            [lastObject]
+          );
+        }
       });
 
-    this.drawingService.highlightAnnotation$
+    this.drawingAnnotationService.highlightAnnotation$
       .pipe(takeUntil(this.destroy$))
       .subscribe((annotation) => {
-        // Crear un lienzo estático para cargar el JSON
-        let tempCanvas = new fabric.StaticCanvas(null);
-
-        tempCanvas.loadFromJSON(annotation.json, () => {
-          tempCanvas.forEachObject((object) => {
-            if (object.type === 'path') {
-              object.set({ stroke: 'yellow', strokeWidth: 5 });
-            }
-            // Verificar si el objeto ya existe en el lienzo
-            let objectExists = this.fabricCanvas
-              .getObjects()
-              .some((existingObject) => {
-                let existingTop = this.roundToTwoDecimals(existingObject.top);
-                let newTop = object.top;
-                let existingLeft = this.roundToTwoDecimals(existingObject.left);
-                let newLeft = object.left;
-
-                return (
-                  existingTop === newTop &&
-                  existingTop === 0 &&
-                  existingLeft === newLeft &&
-                  existingLeft === 0
-                );
-              });
-
-            if (!objectExists) {
-              this.fabricCanvas.add(object);
+        // Obtén los objetos para la anotación
+        const objects =
+          this.drawingAnnotationService.getObjectsForAnnotation(annotation);
+        if (objects) {
+          console.log('Objects to highlight:', objects);
+          // Resalta cada objeto
+          objects.forEach((obj) => {
+            if (obj.type === 'path') {
+              // Si el objeto ya está resaltado, restablece sus propiedades originales
+              if (obj.stroke === 'yellow' && obj.strokeWidth === 5) {
+                obj.set({
+                  stroke: annotation.color,
+                  strokeWidth: annotation.thickness,
+                });
+              }
+              // Si el objeto no está resaltado, aplícale el resaltado
+              else {
+                obj.set({ stroke: 'yellow', strokeWidth: 5 });
+              }
             }
           });
-
           this.fabricCanvas.renderAll();
-        });
+        } else {
+          console.log(
+            `No se encontró ninguna anotación con el nombre ${annotation.name}`
+          );
+        }
       });
+
     /*  this.drawingService.highlightAnnotation$
       .pipe(takeUntil(this.destroy$))
       .subscribe((annotation) => {
