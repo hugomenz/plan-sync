@@ -26,6 +26,8 @@ export class PdfViewerComponent implements AfterViewInit {
   private currentColor: string = 'black'; // valor por defecto
   private currentThickness: number = 1; // valor por defecto
 
+  private newObjects: fabric.Object[] = [];
+
   constructor(
     private drawingService: DrawingService,
     public drawingAnnotationService: DrawingAnnotationService
@@ -64,19 +66,24 @@ export class PdfViewerComponent implements AfterViewInit {
         }
       });
 
+    this.fabricCanvas.on('object:added', (options) => {
+      this.newObjects.push(options.target as fabric.Object);
+    });
+
     this.drawingService.saveAnnotation$
       .pipe(takeUntil(this.destroy$))
       .subscribe((name) => {
-        // Guarda solo el último objeto añadido al lienzo
-        const lastObject = this.fabricCanvas.getObjects().slice(-1)[0];
-        if (lastObject) {
+        if (this.newObjects.length > 0) {
           this.drawingAnnotationService.addAnnotation(
             name,
             this.currentColor,
             this.currentThickness,
-            JSON.stringify(lastObject.toJSON()),
-            [lastObject]
+            JSON.stringify(this.newObjects.map((obj) => obj.toJSON())),
+            [...this.newObjects]
           );
+
+          // Limpia la lista de nuevos objetos
+          this.newObjects = [];
         }
       });
 
