@@ -10,6 +10,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { Subject, takeUntil } from 'rxjs';
 import { DrawingService } from '../drawing-service.service';
 import { DrawingAnnotationService } from '../drawing-annotation.service';
+import { Annotation } from '../models';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -27,6 +28,7 @@ export class PdfViewerComponent implements AfterViewInit {
   private currentThickness: number = 1; // valor por defecto
 
   private newObjects: fabric.Object[] = [];
+  private previousAnnotation!: Annotation;
 
   constructor(
     private drawingService: DrawingService,
@@ -82,7 +84,6 @@ export class PdfViewerComponent implements AfterViewInit {
             [...this.newObjects]
           );
 
-          // Limpia la lista de nuevos objetos
           this.newObjects = [];
         }
       });
@@ -90,25 +91,30 @@ export class PdfViewerComponent implements AfterViewInit {
     this.drawingAnnotationService.highlightAnnotation$
       .pipe(takeUntil(this.destroy$))
       .subscribe((annotation) => {
-        // Obtén los objetos para la anotación
+        if (this.previousAnnotation) {
+          const previousObjects =
+            this.drawingAnnotationService.getObjectsForAnnotation(
+              this.previousAnnotation
+            );
+          if (previousObjects) {
+            previousObjects.forEach((obj) => {
+              if (obj.type === 'path') {
+                obj.set({
+                  stroke: this.previousAnnotation.color,
+                  strokeWidth: this.previousAnnotation.thickness,
+                });
+              }
+            });
+            this.fabricCanvas.renderAll();
+          }
+        }
+
         const objects =
           this.drawingAnnotationService.getObjectsForAnnotation(annotation);
         if (objects) {
-          console.log('Objects to highlight:', objects);
-          // Resalta cada objeto
           objects.forEach((obj) => {
             if (obj.type === 'path') {
-              // Si el objeto ya está resaltado, restablece sus propiedades originales
-              if (obj.stroke === 'yellow' && obj.strokeWidth === 5) {
-                obj.set({
-                  stroke: annotation.color,
-                  strokeWidth: annotation.thickness,
-                });
-              }
-              // Si el objeto no está resaltado, aplícale el resaltado
-              else {
-                obj.set({ stroke: 'yellow', strokeWidth: 5 });
-              }
+              obj.set({ stroke: 'yellow', strokeWidth: 5 });
             }
           });
           this.fabricCanvas.renderAll();
@@ -117,6 +123,8 @@ export class PdfViewerComponent implements AfterViewInit {
             `No se encontró ninguna anotación con el nombre ${annotation.name}`
           );
         }
+
+        this.previousAnnotation = annotation;
       });
 
     /*  this.drawingService.highlightAnnotation$
