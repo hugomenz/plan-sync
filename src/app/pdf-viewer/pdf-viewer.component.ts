@@ -119,7 +119,7 @@ export class PdfViewerComponent implements AfterViewInit {
           });
           this.fabricCanvas.renderAll();
         } else {
-          console.log(
+          console.error(
             `No se encontró ninguna anotación con el nombre ${annotation.name}`
           );
         }
@@ -179,12 +179,8 @@ export class PdfViewerComponent implements AfterViewInit {
 
     loadingTask.promise.then(
       (pdf) => {
-        console.log('PDF loaded');
-
         const pageNumber = 1;
         pdf.getPage(pageNumber).then((page) => {
-          console.log('Page loaded');
-
           const scale = 1.5;
           const viewport = page.getViewport({ scale: scale });
 
@@ -207,8 +203,6 @@ export class PdfViewerComponent implements AfterViewInit {
 
           const renderTask = page.render(renderContext);
           renderTask.promise.then(() => {
-            console.log('Page rendered');
-
             this.brush = new fabric.PencilBrush(this.fabricCanvas);
             this.fabricCanvas.freeDrawingBrush = this.brush;
 

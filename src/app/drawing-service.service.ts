@@ -27,13 +27,10 @@ export class DrawingService {
   }
 
   changeColor(color: string) {
-    console.log(`called changeColor: ${color}`);
     this._colorChange.next(color);
   }
 
   changeThickness(thickness: number) {
-    console.log(`called changeThickness: ${thickness}`);
-
     this._thicknessChange.next(thickness);
   }
 

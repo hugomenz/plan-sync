@@ -38,7 +38,6 @@ export class DrawingAnnotationService {
 
   highlightAnnotation(annotation: Annotation) {
     this._highlightAnnotation.next(annotation);
-    console.log('Annotation to highlight:', annotation);
   }
 
   getObjectsForAnnotation(annotation: Annotation): fabric.Object[] | undefined {
