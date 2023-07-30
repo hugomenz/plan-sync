@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { DrawingAnnotationService } from '../drawing-annotation.service';
 import { Annotation } from '../models';
+import { DrawingService } from '../drawing-service.service';
 
 @Component({
   selector: 'app-left-sidebar',
@@ -8,7 +9,10 @@ import { Annotation } from '../models';
   styleUrls: ['./left-sidebar.component.scss'],
 })
 export class LeftSidebarComponent {
-  constructor(public drawingAnnotationService: DrawingAnnotationService) {}
+  constructor(
+    public drawingService: DrawingService,
+    public drawingAnnotationService: DrawingAnnotationService
+  ) {}
 
   sidebarVisible: boolean = true;
 

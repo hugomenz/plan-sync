@@ -9,7 +9,7 @@
   <ul>
     <li
       *ngFor="let annotation of drawingAnnotationService.annotations"
-      (click)="selectAnnotation(annotation)"
+      (click)="drawingService.highlightAnnotation(annotation)"
     >
       {{ annotation.name }}
       <span [style.background-color]="annotation.color"></span>

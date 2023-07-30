@@ -72,11 +72,93 @@ export class PdfViewerComponent implements AfterViewInit {
           name,
           this.currentColor, // utiliza el color actual
           this.currentThickness, // utiliza el grosor actual
-          json
+          json,
+          this.fabricCanvas.toJSON().objects
         );
+        console.log('-----------------------------------------');
+        console.log(`guardando - desde servicio - `);
+        console.log(JSON.stringify(this.fabricCanvas.toJSON().objects));
+        console.log('-----------------------------------------');
       });
 
+    this.drawingService.highlightAnnotation$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((annotation) => {
+        // Crear un lienzo estático para cargar el JSON
+        let tempCanvas = new fabric.StaticCanvas(null);
+
+        tempCanvas.loadFromJSON(annotation.json, () => {
+          tempCanvas.forEachObject((object) => {
+            if (object.type === 'path') {
+              object.set({ stroke: 'yellow', strokeWidth: 5 });
+            }
+            // Verificar si el objeto ya existe en el lienzo
+            let objectExists = this.fabricCanvas
+              .getObjects()
+              .some((existingObject) => {
+                let existingTop = this.roundToTwoDecimals(existingObject.top);
+                let newTop = object.top;
+                let existingLeft = this.roundToTwoDecimals(existingObject.left);
+                let newLeft = object.left;
+
+                return (
+                  existingTop === newTop &&
+                  existingTop === 0 &&
+                  existingLeft === newLeft &&
+                  existingLeft === 0
+                );
+              });
+
+            if (!objectExists) {
+              this.fabricCanvas.add(object);
+            }
+          });
+
+          this.fabricCanvas.renderAll();
+        });
+      });
+    /*  this.drawingService.highlightAnnotation$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((annotation) => {
+        // Crear un lienzo estático para cargar el JSON
+        let tempCanvas = new fabric.StaticCanvas(null);
+
+        tempCanvas.loadFromJSON(annotation.json, () => {
+          tempCanvas.forEachObject((object) => {
+            if (object.type === 'path') {
+              object.set({ stroke: 'yellow', strokeWidth: 5 });
+            }
+            // Verificar si el objeto ya existe en el lienzo
+            let objectExists = this.fabricCanvas
+              .getObjects()
+              .some((existingObject) => {
+                let existingTop = this.roundToTwoDecimals(existingObject.top);
+                let newTop = object.top;
+                let existingLeft = this.roundToTwoDecimals(existingObject.left);
+                let newLeft = object.left;
+
+                return (
+                  existingTop === newTop &&
+                  existingTop === 0 &&
+                  existingLeft === newLeft &&
+                  existingLeft === 0
+                );
+              });
+
+            if (!objectExists) {
+              this.fabricCanvas.add(object);
+            }
+          });
+
+          this.fabricCanvas.renderAll();
+        });
+      }); */
+
     this.loadPDF();
+  }
+
+  private roundToTwoDecimals(num: number | undefined): number {
+    return Number(num?.toFixed(2));
   }
 
   private loadPDF(): void {
