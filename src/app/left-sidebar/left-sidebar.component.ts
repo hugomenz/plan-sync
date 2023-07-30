@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { DrawingAnnotationService } from '../drawing-annotation.service';
 import { Annotation } from '../models';
 import { DrawingService } from '../drawing-service.service';
@@ -9,20 +9,17 @@ import { DrawingService } from '../drawing-service.service';
   styleUrls: ['./left-sidebar.component.scss'],
 })
 export class LeftSidebarComponent {
+  @Output() annotationSelected = new EventEmitter<Annotation>();
+  @Output() sidebarVisibilityChanged = new EventEmitter<boolean>();
+
+  sidebarVisible: boolean = true;
+
   constructor(
     public drawingService: DrawingService,
     public drawingAnnotationService: DrawingAnnotationService
   ) {}
 
-  sidebarVisible: boolean = true;
-
-  // Event emitter for when an annotation is selected
-  @Output() annotationSelected = new EventEmitter<Annotation>();
-
-  @Output() sidebarVisibilityChanged = new EventEmitter<boolean>();
-
   selectAnnotation(annotation: Annotation) {
-    // Emit the selected annotation
     this.annotationSelected.emit(annotation);
   }
 

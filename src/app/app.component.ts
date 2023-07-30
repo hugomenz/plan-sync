@@ -8,9 +8,12 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'spike_pdf-viewer_pdf-js';
 
-  drawingColor: string = 'blue';
-  drawingThickness: number = 3;
-  drawingEnabled: boolean = false;
+  drawingColor = 'blue';
+  drawingThickness = 3;
+  drawingEnabled = false;
+
+  leftSidebarVisible = true;
+  rightSidebarVisible = true;
 
   onNewDrawing() {
     this.drawingEnabled = true;
@@ -27,9 +30,6 @@ export class AppComponent {
   handleThinknessSelected(thickness: number) {
     this.drawingThickness = thickness;
   }
-
-  leftSidebarVisible: boolean = true;
-  rightSidebarVisible: boolean = true;
 
   handleSidebarVisibilityChange(sidebar: 'left' | 'right', isVisible: boolean) {
     if (sidebar === 'left') {
