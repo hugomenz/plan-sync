@@ -4,15 +4,63 @@
   </div>
   
   <div class="sidebar-content">
+    <!-- Tool Selection -->
+    <div class="tools-section">
+      <div class="section-title">Herramientas</div>
+      <div class="tools-grid">
+        <button 
+          *ngFor="let tool of availableTools"
+          class="tool-button"
+          [class.selected]="selectedTool === tool.id"
+          (click)="selectTool(tool.id)"
+          [title]="tool.description"
+        >
+          <span class="tool-icon">{{ tool.icon }}</span>
+          <span class="tool-name">{{ tool.name }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+      <div class="section-title">Acciones Rápidas</div>
+      <div class="quick-actions">
+        <button 
+          class="action-btn"
+          (click)="onUndo()"
+          [disabled]="!annotationToolService.canUndo"
+          title="Deshacer (Ctrl+Z)"
+        >
+          ↶ Deshacer
+        </button>
+        <button 
+          class="action-btn"
+          (click)="onRedo()"
+          [disabled]="!annotationToolService.canRedo"
+          title="Rehacer (Ctrl+Y)"
+        >
+          ↷ Rehacer
+        </button>
+        <button 
+          class="action-btn action-btn-danger"
+          (click)="onClearAll()"
+          title="Limpiar todo"
+        >
+          🗑️ Limpiar
+        </button>
+      </div>
+    </div>
+    
+    <!-- New Annotation Section -->
     <div class="new-annotation-section">
       <button (click)="onNewDrawing()" class="create-button" [disabled]="isDrawing">
-        <span class="icon">✏️</span>
+        <span class="icon">{{ selectedToolIcon }}</span>
         {{ isDrawing ? 'Dibujando...' : 'Nueva Anotación' }}
       </button>
     </div>
     
     <div *ngIf="isDrawing" class="tools">
-      <div class="section-title">Configuración de Dibujo</div>
+      <div class="section-title">Configuración de {{ selectedToolName }}</div>
       
       <div class="form-group">
         <label class="form-label">Nombre de la anotación</label>
@@ -29,14 +77,16 @@
         <div class="color-selector">
           <button 
             *ngFor="let color of availableColors" 
-            [class]="'color-option ' + color.name + (selectedColor === color.value ? ' selected' : '')"
+            class="color-option"
+            [class.selected]="selectedColor === color.value"
+            [style.background-color]="color.value"
             (click)="selectColor(color.value)"
             [title]="color.label"
           ></button>
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" *ngIf="selectedTool === 'pen' || selectedTool === 'highlighter'">
         <label class="form-label">Grosor de línea</label>
         <div class="thickness-selector">
           <button 
@@ -63,11 +113,30 @@
     <div *ngIf="!isDrawing" class="info-section">
       <div class="section-title">Instrucciones</div>
       <p class="help-text">
-        1. Haz clic en "Nueva Anotación" para comenzar<br>
-        2. Selecciona el color y grosor deseado<br>
-        3. Dibuja directamente sobre el PDF<br>
-        4. Guarda tu anotación cuando termines
+        1. Selecciona una herramienta de anotación<br>
+        2. Haz clic en "Nueva Anotación"<br>
+        3. Configura color y opciones<br>
+        4. Dibuja sobre el documento<br>
+        5. Guarda tu anotación
       </p>
+      
+      <div class="shortcuts-info">
+        <div class="section-title">Atajos de Teclado</div>
+        <div class="shortcut-list">
+          <div class="shortcut-item">
+            <span class="key">Ctrl + Z</span>
+            <span class="desc">Deshacer</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key">Ctrl + Y</span>
+            <span class="desc">Rehacer</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key">Esc</span>
+            <span class="desc">Cancelar anotación</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

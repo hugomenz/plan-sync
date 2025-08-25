@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DocumentInfo } from './file-upload.service';
 
 @Component({
   selector: 'app-root',
@@ -37,5 +38,30 @@ export class AppComponent {
     } else {
       this.rightSidebarVisible = isVisible;
     }
+  }
+
+  onDocumentSelected(document: DocumentInfo) {
+    console.log('Document selected:', document);
+    // TODO: Load the selected document in the PDF viewer
+  }
+
+  onExportRequested(format: string) {
+    console.log('Export requested:', format);
+    // TODO: Implement export functionality
+    if (format === 'pdf') {
+      this.exportAsPDF();
+    } else if (format === 'image') {
+      this.exportAsImage();
+    }
+  }
+
+  private exportAsPDF() {
+    // TODO: Implement PDF export with annotations
+    alert('Funcionalidad de exportar PDF estará disponible próximamente');
+  }
+
+  private exportAsImage() {
+    // TODO: Implement image export
+    alert('Funcionalidad de exportar imagen estará disponible próximamente');
   }
 }
