@@ -1,18 +1,46 @@
-<button
-  (click)="toggleSidebar()"
-  class="toggle-button"
-  [class.collapsed]="!sidebarVisible"
->
-  {{ sidebarVisible ? "Ocultar" : "Mostrar" }}
-</button>
 <div class="sidebar" [class.collapsed]="!sidebarVisible">
-  <ul>
-    <li
-      *ngFor="let annotation of drawingAnnotationService.annotations"
-      (click)="drawingAnnotationService.highlightAnnotation(annotation)"
+  <div class="sidebar-header">
+    <h2>Anotaciones</h2>
+    <button
+      (click)="toggleSidebar()"
+      class="toggle-button"
+      [class.collapsed]="!sidebarVisible"
+      [title]="sidebarVisible ? 'Ocultar panel' : 'Mostrar panel'"
     >
-      {{ annotation.name }}
-      <span [style.background-color]="annotation.color"></span>
-    </li>
-  </ul>
+      {{ sidebarVisible ? "✕" : "☰" }}
+    </button>
+  </div>
+  
+  <div class="sidebar-content">
+    <ul class="annotations-list" *ngIf="drawingAnnotationService.annotations.length > 0; else emptyState">
+      <li
+        *ngFor="let annotation of drawingAnnotationService.annotations; trackBy: trackByAnnotation"
+        (click)="drawingAnnotationService.highlightAnnotation(annotation)"
+        class="annotation-item"
+        [class.active]="selectedAnnotation === annotation"
+      >
+        <div class="annotation-info">
+          <div class="annotation-name">{{ annotation.name }}</div>
+          <div class="annotation-details">
+            Grosor: {{ annotation.thickness }}px
+          </div>
+        </div>
+        <span 
+          class="annotation-color"
+          [style.background-color]="annotation.color"
+          [title]="'Color: ' + annotation.color"
+        ></span>
+      </li>
+    </ul>
+    
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <div class="empty-title">Sin anotaciones</div>
+        <div class="empty-description">
+          Crea tu primera anotación usando las herramientas del panel derecho
+        </div>
+      </div>
+    </ng-template>
+  </div>
 </div>

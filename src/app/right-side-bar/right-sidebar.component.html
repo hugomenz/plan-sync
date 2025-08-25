@@ -1,27 +1,73 @@
 <div class="sidebar">
-  <h3>Crea nueva anotacion</h3>
-  <button (click)="onNewDrawing()">+</button>
-  <div *ngIf="isDrawing" class="tools">
-    <input [(ngModel)]="drawingName" placeholder="Nombre del dibujo" />
-    <select
-      [(ngModel)]="selectedColor"
-      (ngModelChange)="drawingService.changeColor(selectedColor)"
-    >
-      <option value="red">Rojo</option>
-      <option value="blue">Azul</option>
-      <option value="green">Verde</option>
-    </select>
+  <div class="sidebar-header">
+    <h3>Herramientas de Anotación</h3>
+  </div>
+  
+  <div class="sidebar-content">
+    <div class="new-annotation-section">
+      <button (click)="onNewDrawing()" class="create-button" [disabled]="isDrawing">
+        <span class="icon">✏️</span>
+        {{ isDrawing ? 'Dibujando...' : 'Nueva Anotación' }}
+      </button>
+    </div>
+    
+    <div *ngIf="isDrawing" class="tools">
+      <div class="section-title">Configuración de Dibujo</div>
+      
+      <div class="form-group">
+        <label class="form-label">Nombre de la anotación</label>
+        <input 
+          [(ngModel)]="drawingName" 
+          placeholder="Ej: Corrección estructural" 
+          class="form-input"
+          type="text"
+        />
+      </div>
 
-    <select
-      [(ngModel)]="selectedThickness"
-      (ngModelChange)="drawingService.changeThickness(selectedThickness)"
-    >
-      <option value="1">1px</option>
-      <option value="3">3px</option>
-      <option value="5">5px</option>
-    </select>
+      <div class="form-group">
+        <label class="form-label">Color</label>
+        <div class="color-selector">
+          <button 
+            *ngFor="let color of availableColors" 
+            [class]="'color-option ' + color.name + (selectedColor === color.value ? ' selected' : '')"
+            (click)="selectColor(color.value)"
+            [title]="color.label"
+          ></button>
+        </div>
+      </div>
 
-    <button (click)="onFinishDrawing()">Finalizar</button>
-    <!-- Updated -->
+      <div class="form-group">
+        <label class="form-label">Grosor de línea</label>
+        <div class="thickness-selector">
+          <button 
+            *ngFor="let thickness of availableThickness"
+            class="thickness-option"
+            [class.selected]="selectedThickness === thickness"
+            (click)="selectThickness(thickness)"
+          >
+            {{ thickness }}px
+          </button>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button (click)="onCancelDrawing()" class="cancel-button">
+          Cancelar
+        </button>
+        <button (click)="onFinishDrawing()" class="finish-button">
+          Guardar
+        </button>
+      </div>
+    </div>
+    
+    <div *ngIf="!isDrawing" class="info-section">
+      <div class="section-title">Instrucciones</div>
+      <p class="help-text">
+        1. Haz clic en "Nueva Anotación" para comenzar<br>
+        2. Selecciona el color y grosor deseado<br>
+        3. Dibuja directamente sobre el PDF<br>
+        4. Guarda tu anotación cuando termines
+      </p>
+    </div>
   </div>
 </div>

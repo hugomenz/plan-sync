@@ -1,3 +1,32 @@
 <div class="app-pdf-viewer">
-  <canvas #myCanvas></canvas>
+  <div class="pdf-header">
+    <h1 class="pdf-title">Plan-Sync - Visor de Documentos</h1>
+    <div class="pdf-controls">
+      <div class="zoom-controls">
+        <button (click)="zoomOut()" title="Alejar" [disabled]="currentZoom <= minZoom">−</button>
+        <span class="zoom-level">{{ (currentZoom * 100).toFixed(0) }}%</span>
+        <button (click)="zoomIn()" title="Acercar" [disabled]="currentZoom >= maxZoom">+</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="pdf-viewer-container">
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Cargando documento...</div>
+    </div>
+    
+    <div *ngIf="!isLoading && !hasDocument" class="empty-state">
+      <div class="empty-icon">📄</div>
+      <div class="empty-title">Documento de Muestra</div>
+      <div class="empty-description">
+        Se está cargando un documento PDF de prueba. 
+        En la versión completa podrás cargar tus propios archivos.
+      </div>
+    </div>
+    
+    <div *ngIf="!isLoading && hasDocument" class="pdf-canvas-wrapper">
+      <canvas #myCanvas></canvas>
+    </div>
+  </div>
 </div>

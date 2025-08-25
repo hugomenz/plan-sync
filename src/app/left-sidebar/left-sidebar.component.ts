@@ -13,18 +13,29 @@ export class LeftSidebarComponent {
   @Output() sidebarVisibilityChanged = new EventEmitter<boolean>();
 
   sidebarVisible: boolean = true;
+  selectedAnnotation: Annotation | null = null;
 
   constructor(
     public drawingService: DrawingService,
     public drawingAnnotationService: DrawingAnnotationService
-  ) {}
+  ) {
+    // Subscribe to annotation highlights to track selection
+    this.drawingAnnotationService.highlightAnnotation$.subscribe(annotation => {
+      this.selectedAnnotation = annotation;
+    });
+  }
 
   selectAnnotation(annotation: Annotation) {
+    this.selectedAnnotation = annotation;
     this.annotationSelected.emit(annotation);
   }
 
   toggleSidebar(): void {
     this.sidebarVisible = !this.sidebarVisible;
     this.sidebarVisibilityChanged.emit(this.sidebarVisible);
+  }
+
+  trackByAnnotation(index: number, annotation: Annotation): number {
+    return annotation.id;
   }
 }

@@ -1,6 +1,12 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { DrawingService } from '../drawing-service.service';
 
+interface ColorOption {
+  name: string;
+  value: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-right-sidebar',
   templateUrl: './right-sidebar.component.html',
@@ -16,9 +22,24 @@ export class RightSidebarComponent implements OnInit {
   selectedThickness = 3;
   isVisible = true;
 
+  availableColors: ColorOption[] = [
+    { name: 'red', value: 'red', label: 'Rojo' },
+    { name: 'blue', value: 'blue', label: 'Azul' },
+    { name: 'green', value: 'green', label: 'Verde' },
+    { name: 'yellow', value: 'yellow', label: 'Amarillo' },
+    { name: 'purple', value: 'purple', label: 'Púrpura' },
+    { name: 'orange', value: 'orange', label: 'Naranja' },
+  ];
+
+  availableThickness: number[] = [1, 3, 5];
+
   constructor(public drawingService: DrawingService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Initialize with default values
+    this.drawingService.changeColor(this.selectedColor);
+    this.drawingService.changeThickness(this.selectedThickness);
+  }
 
   onNewDrawing(): void {
     this.isDrawing = true;
@@ -26,17 +47,29 @@ export class RightSidebarComponent implements OnInit {
     this.drawingService.startDrawing();
   }
 
-  onColorChange(): void {
-    this.drawingService.changeColor(this.selectedColor);
+  selectColor(color: string): void {
+    this.selectedColor = color;
+    this.drawingService.changeColor(color);
   }
 
-  onThicknessChange(): void {
-    this.drawingService.changeThickness(this.selectedThickness);
+  selectThickness(thickness: number): void {
+    this.selectedThickness = thickness;
+    this.drawingService.changeThickness(thickness);
   }
 
   onFinishDrawing(): void {
+    if (!this.drawingName.trim()) {
+      this.drawingName = `Anotación ${new Date().toLocaleTimeString()}`;
+    }
+    
     this.isDrawing = false;
     this.drawingService.saveAnnotation(this.drawingName);
+    this.drawingService.stopDrawing();
+  }
+
+  onCancelDrawing(): void {
+    this.isDrawing = false;
+    this.drawingName = '';
     this.drawingService.stopDrawing();
   }
 
