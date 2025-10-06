@@ -1,26 +1,73 @@
 <div class="toolbar">
-  <button
-    class="color-button"
-    style="background-color: red"
-    (click)="selectColor('red')"
-  ></button>
-  <button
-    class="color-button"
-    style="background-color: blue"
-    (click)="selectColor('blue')"
-  ></button>
-  <button
-    class="color-button"
-    style="background-color: green"
-    (click)="selectColor('green')"
-  ></button>
+  <!-- File Operations -->
+  <div class="toolbar-section">
+    <input 
+      #fileInput 
+      type="file" 
+      accept=".pdf" 
+      (change)="onFileUpload($event)"
+      style="display: none"
+    />
+    
+    <button class="toolbar-btn toolbar-btn-primary" (click)="triggerFileUpload()" title="Subir PDF">
+      📁 Subir PDF
+    </button>
+    
+    <select 
+      class="document-selector"
+      [value]="fileUploadService.currentDocument?.id || ''"
+      (change)="onDocumentSelect($event)"
+      [disabled]="fileUploadService.documents.length === 0"
+    >
+      <option value="" disabled>Seleccionar documento</option>
+      <option *ngFor="let doc of fileUploadService.documents" [value]="doc.id">
+        {{ doc.name }}
+      </option>
+    </select>
+  </div>
 
-  <button (click)="selectThickness(1)">1px</button>
-  <button (click)="selectThickness(3)">3px</button>
-  <button (click)="selectThickness(5)">5px</button>
+  <!-- View Controls -->
+  <div class="toolbar-section">
+    <button class="toolbar-btn" (click)="onFullscreen()" title="Pantalla completa">
+      ⛶
+    </button>
+    
+    <div class="search-container">
+      <input 
+        type="text" 
+        placeholder="Buscar anotaciones..." 
+        class="search-input"
+        (input)="onSearchInput($event)"
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+  </div>
 
-  <label>
-    <input type="checkbox" (change)="toggleDrawing($event)" />
-    Activar dibujo
-  </label>
+  <!-- Export & Actions -->
+  <div class="toolbar-section">
+    <button class="toolbar-btn" (click)="onExportPDF()" title="Exportar PDF">
+      📄 PDF
+    </button>
+    
+    <button class="toolbar-btn" (click)="onExportImage()" title="Exportar imagen">
+      🖼️ Imagen
+    </button>
+    
+    <button class="toolbar-btn" (click)="onPrint()" title="Imprimir">
+      🖨️
+    </button>
+  </div>
+
+  <!-- Upload Progress -->
+  <div *ngIf="fileUploadService.isUploading$ | async" class="upload-progress">
+    <div class="progress-bar">
+      <div 
+        class="progress-fill"
+        [style.width.%]="(fileUploadService.uploadProgress$ | async) || 0"
+      ></div>
+    </div>
+    <span class="progress-text">
+      Subiendo... {{ (fileUploadService.uploadProgress$ | async) || 0 | number:'1.0-0' }}%
+    </span>
+  </div>
 </div>

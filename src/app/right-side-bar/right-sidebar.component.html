@@ -1,27 +1,142 @@
 <div class="sidebar">
-  <h3>Crea nueva anotacion</h3>
-  <button (click)="onNewDrawing()">+</button>
-  <div *ngIf="isDrawing" class="tools">
-    <input [(ngModel)]="drawingName" placeholder="Nombre del dibujo" />
-    <select
-      [(ngModel)]="selectedColor"
-      (ngModelChange)="drawingService.changeColor(selectedColor)"
-    >
-      <option value="red">Rojo</option>
-      <option value="blue">Azul</option>
-      <option value="green">Verde</option>
-    </select>
+  <div class="sidebar-header">
+    <h3>Herramientas de Anotación</h3>
+  </div>
+  
+  <div class="sidebar-content">
+    <!-- Tool Selection -->
+    <div class="tools-section">
+      <div class="section-title">Herramientas</div>
+      <div class="tools-grid">
+        <button 
+          *ngFor="let tool of availableTools"
+          class="tool-button"
+          [class.selected]="selectedTool === tool.id"
+          (click)="selectTool(tool.id)"
+          [title]="tool.description"
+        >
+          <span class="tool-icon">{{ tool.icon }}</span>
+          <span class="tool-name">{{ tool.name }}</span>
+        </button>
+      </div>
+    </div>
 
-    <select
-      [(ngModel)]="selectedThickness"
-      (ngModelChange)="drawingService.changeThickness(selectedThickness)"
-    >
-      <option value="1">1px</option>
-      <option value="3">3px</option>
-      <option value="5">5px</option>
-    </select>
+    <!-- Quick Actions -->
+    <div class="actions-section">
+      <div class="section-title">Acciones Rápidas</div>
+      <div class="quick-actions">
+        <button 
+          class="action-btn"
+          (click)="onUndo()"
+          [disabled]="!annotationToolService.canUndo"
+          title="Deshacer (Ctrl+Z)"
+        >
+          ↶ Deshacer
+        </button>
+        <button 
+          class="action-btn"
+          (click)="onRedo()"
+          [disabled]="!annotationToolService.canRedo"
+          title="Rehacer (Ctrl+Y)"
+        >
+          ↷ Rehacer
+        </button>
+        <button 
+          class="action-btn action-btn-danger"
+          (click)="onClearAll()"
+          title="Limpiar todo"
+        >
+          🗑️ Limpiar
+        </button>
+      </div>
+    </div>
+    
+    <!-- New Annotation Section -->
+    <div class="new-annotation-section">
+      <button (click)="onNewDrawing()" class="create-button" [disabled]="isDrawing">
+        <span class="icon">{{ selectedToolIcon }}</span>
+        {{ isDrawing ? 'Dibujando...' : 'Nueva Anotación' }}
+      </button>
+    </div>
+    
+    <div *ngIf="isDrawing" class="tools">
+      <div class="section-title">Configuración de {{ selectedToolName }}</div>
+      
+      <div class="form-group">
+        <label class="form-label">Nombre de la anotación</label>
+        <input 
+          [(ngModel)]="drawingName" 
+          placeholder="Ej: Corrección estructural" 
+          class="form-input"
+          type="text"
+        />
+      </div>
 
-    <button (click)="onFinishDrawing()">Finalizar</button>
-    <!-- Updated -->
+      <div class="form-group">
+        <label class="form-label">Color</label>
+        <div class="color-selector">
+          <button 
+            *ngFor="let color of availableColors" 
+            class="color-option"
+            [class.selected]="selectedColor === color.value"
+            [style.background-color]="color.value"
+            (click)="selectColor(color.value)"
+            [title]="color.label"
+          ></button>
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="selectedTool === 'pen' || selectedTool === 'highlighter'">
+        <label class="form-label">Grosor de línea</label>
+        <div class="thickness-selector">
+          <button 
+            *ngFor="let thickness of availableThickness"
+            class="thickness-option"
+            [class.selected]="selectedThickness === thickness"
+            (click)="selectThickness(thickness)"
+          >
+            {{ thickness }}px
+          </button>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button (click)="onCancelDrawing()" class="cancel-button">
+          Cancelar
+        </button>
+        <button (click)="onFinishDrawing()" class="finish-button">
+          Guardar
+        </button>
+      </div>
+    </div>
+    
+    <div *ngIf="!isDrawing" class="info-section">
+      <div class="section-title">Instrucciones</div>
+      <p class="help-text">
+        1. Selecciona una herramienta de anotación<br>
+        2. Haz clic en "Nueva Anotación"<br>
+        3. Configura color y opciones<br>
+        4. Dibuja sobre el documento<br>
+        5. Guarda tu anotación
+      </p>
+      
+      <div class="shortcuts-info">
+        <div class="section-title">Atajos de Teclado</div>
+        <div class="shortcut-list">
+          <div class="shortcut-item">
+            <span class="key">Ctrl + Z</span>
+            <span class="desc">Deshacer</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key">Ctrl + Y</span>
+            <span class="desc">Rehacer</span>
+          </div>
+          <div class="shortcut-item">
+            <span class="key">Esc</span>
+            <span class="desc">Cancelar anotación</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

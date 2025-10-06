@@ -37,14 +37,9 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
     private drawingService: DrawingService,
     public drawingAnnotationService: DrawingAnnotationService
   ) {}
+  ) {}
 
   ngAfterViewInit() {
-    // Ensure the canvas element is available
-    if (!this.canvasElement) {
-      console.error('Canvas element not found');
-      return;
-    }
-
     this.fabricCanvas = new fabric.Canvas(this.canvasElement.nativeElement);
 
     this.drawingService.startDrawing$
@@ -61,7 +56,7 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
 
     this.drawingService.colorChange$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((color: string) => {
+      .subscribe((color) => {
         this.currentColor = color;
         if (this.brush) {
           this.brush.color = color;
@@ -70,26 +65,26 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
 
     this.drawingService.thicknessChange$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((thickness: number) => {
+      .subscribe((thickness) => {
         this.currentThickness = thickness;
         if (this.brush) {
           this.brush.width = thickness;
         }
       });
 
-    this.fabricCanvas.on('object:added', (options: any) => {
+    this.fabricCanvas.on('object:added', (options) => {
       this.newObjects.push(options.target as fabric.Object);
     });
 
     this.drawingService.saveAnnotation$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((name: string) => {
+      .subscribe((name) => {
         if (this.newObjects.length > 0) {
           this.drawingAnnotationService.addAnnotation(
             name,
             this.currentColor,
             this.currentThickness,
-            JSON.stringify(this.newObjects.map((obj: any) => obj.toJSON())),
+            JSON.stringify(this.newObjects.map((obj) => obj.toJSON())),
             [...this.newObjects]
           );
 
@@ -99,7 +94,7 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
 
     this.drawingAnnotationService.highlightAnnotation$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((annotation: Annotation) => {
+      .subscribe((annotation) => {
         if (this.previousAnnotation) {
           this.updateObjects(
             this.previousAnnotation,
@@ -126,9 +121,9 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
     const loadingTask = pdfjsLib.getDocument('/assets/test.pdf');
 
     loadingTask.promise.then(
-      (pdf: any) => {
+      (pdf) => {
         const pageNumber = 1;
-        pdf.getPage(pageNumber).then((page: any) => {
+        pdf.getPage(pageNumber).then((page) => {
           const scale = this.currentZoom * 1.5;
           const viewport = page.getViewport({ scale: scale });
 
@@ -154,7 +149,7 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
             this.brush = new fabric.PencilBrush(this.fabricCanvas);
             this.fabricCanvas.freeDrawingBrush = this.brush;
 
-            fabric.Image.fromURL(pdfCanvas.toDataURL(), (img: fabric.Image) => {
+            fabric.Image.fromURL(pdfCanvas.toDataURL(), (img) => {
               img.set({
                 left: 0,
                 top: 0,
@@ -172,7 +167,7 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
           });
         });
       },
-      (reason: any) => {
+      (reason) => {
         console.error('Error loading PDF:', reason);
         this.isLoading = false;
         this.hasDocument = false;
@@ -188,14 +183,14 @@ export class PdfViewerComponent implements AfterViewInit, OnDestroy {
     const objects =
       this.drawingAnnotationService.getObjectsForAnnotation(annotation);
     if (objects) {
-      objects.forEach((obj: any) => {
+      objects.forEach((obj) => {
         if (obj.type === 'path') {
           obj.set({ stroke, strokeWidth });
         }
       });
       this.fabricCanvas.renderAll();
     } else {
-      console.error(`Annotation not found with the name: ${annotation.name}`);
+      console.error(`Annotation not found with the name:  ${annotation.name}`);
     }
   }
 

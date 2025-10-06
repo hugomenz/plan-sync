@@ -1,13 +1,18 @@
-<app-left-sidebar
-  [ngClass]="{ 'sidebar-collapsed': !leftSidebarVisible }"
-  (sidebarVisibilityChanged)="handleSidebarVisibilityChange('left', $event)"
-></app-left-sidebar>
+<app-toolbar
+  (documentSelected)="onDocumentSelected($event)"
+  (exportRequested)="onExportRequested($event)"
+></app-toolbar>
 
-<app-pdf-viewer class="pdf-viewer"></app-pdf-viewer>
-<!-- Updated -->
+<div class="main-content">
+  <app-left-sidebar
+    [ngClass]="{ 'sidebar-collapsed': !leftSidebarVisible }"
+    (sidebarVisibilityChanged)="handleSidebarVisibilityChange('left', $event)"
+  ></app-left-sidebar>
 
-<app-right-sidebar class="right-sidebar"></app-right-sidebar>
-<!-- Updated -->
+  <app-pdf-viewer class="pdf-viewer"></app-pdf-viewer>
+
+  <app-right-sidebar class="right-sidebar"></app-right-sidebar>
+</div>
 
 <!-- <app-right-sidebar
   class="right-sidebar"
